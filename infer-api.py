@@ -11,8 +11,8 @@ from pydantic import BaseModel, Field
 from acestep.pipeline_ace_step import ACEStepPipeline
 from supabase_store import SupabaseStore
 
+  
 app = FastAPI(title="ACEStep Pipeline API")
-
 model: Optional[ACEStepPipeline] = None
 model_checkpoint_path: Optional[str] = None
 generation_lock = asyncio.Lock()

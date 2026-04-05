@@ -1,0 +1,29 @@
+services:
+  ace-step:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ace-step
+    hostname: ace-step
+    stop_grace_period: 30s
+    ports:
+      - "8000:8000"
+      - "7865:7865"
+    volumes:
+      - ./checkpoints:/app/checkpoints
+      - ./outputs:/app/outputs
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    environment:
+      - APP_MODE=${APP_MODE:-api}
+      - PORT=8000
+      - OUTPUT_DIR=/app/outputs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    restart: unless-stopped
+    gpus: all

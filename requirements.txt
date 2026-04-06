@@ -9,7 +9,7 @@ pypinyin==0.53.0
 pytorch_lightning==2.5.1
 soundfile==0.13.1
 torch
-torchcodec
+torchcodec==0.9
 torchaudio
 torchvision
 tqdm

@@ -1,26 +1,23 @@
-*.pt
-*.ckpt
-*.onnx
-t5_g2p_model/
-embeddings/
-checkpoints/
+#Exclude potential (c) training data
+*_lyrics.txt
+*.mp3
+AlbumArt*.jpg
+Folder.jpg
 
-val_images/
-val_audios/
-lightning_logs/
-lightning_logs_/
-train_images/
-train_audios/
+
+data/
+*.mp3
+*.wav
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[cod]
+*.py[codz]
 *$py.class
 
 # C extensions
 *.so
 
 # Distribution / packaging
-.idea/
 .Python
 build/
 develop-eggs/
@@ -60,7 +57,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
-*.py,cover
+*.py.cover
 .hypothesis/
 .pytest_cache/
 cover/
@@ -108,20 +105,35 @@ ipython_config.py
 #   install all needed dependencies.
 #Pipfile.lock
 
+# UV
+#   Similar to Pipfile.lock, it is generally recommended to include uv.lock in version control.
+#   This is especially recommended for binary packages to ensure reproducibility, and is more
+#   commonly ignored for libraries.
+uv.lock
+
 # poetry
 #   Similar to Pipfile.lock, it is generally recommended to include poetry.lock in version control.
 #   This is especially recommended for binary packages to ensure reproducibility, and is more
 #   commonly ignored for libraries.
 #   https://python-poetry.org/docs/basic-usage/#commit-your-poetrylock-file-to-version-control
 #poetry.lock
+#poetry.toml
 
 # pdm
 #   Similar to Pipfile.lock, it is generally recommended to include pdm.lock in version control.
+#   pdm recommends including project-wide configuration in pdm.toml, but excluding .pdm-python.
+#   https://pdm-project.org/en/latest/usage/project/#working-with-version-control
 #pdm.lock
-#   pdm stores project-wide configurations in .pdm.toml, but it is recommended to not include it
-#   in version control.
-#   https://pdm.fming.dev/#use-with-ide
-.pdm.toml
+#pdm.toml
+.pdm-python
+.pdm-build/
+
+# pixi
+#   Similar to Pipfile.lock, it is generally recommended to include pixi.lock in version control.
+#pixi.lock
+#   Pixi creates a virtual environment in the .pixi directory, just like venv module creates one
+#   in the .venv directory. It is recommended not to include this directory in version control.
+.pixi
 
 # PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
 __pypackages__/
@@ -135,6 +147,7 @@ celerybeat.pid
 
 # Environments
 .env
+.envrc
 .venv
 env/
 venv/
@@ -172,32 +185,76 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
-!requirements.txt
-*.log
-*.flac
-*.wav
-minio_config.yaml
-.history/*
-__pycache__/*
-train.log
-*.tar.gz
-__pycache__/
-demo_examples/
-nohup.out
-test_results/*
-nohup.out
-text_audio_align/*
-remote/*
-MG2P/*
-audio_getter.py
-refiner_loss_debug/
-outputs/*
-!outputs/
-save_checkpoint.ipynb
-repos/*
-app_demo.py
-ui/components_demo.py
-data_sampler_demo.py
-pipeline_ace_step_demo.py
-*.wav
-exps/*
+
+# Abstra
+# Abstra is an AI-powered process automation framework.
+# Ignore directories containing user credentials, local state, and settings.
+# Learn more at https://abstra.io/docs
+.abstra/
+
+# Visual Studio Code
+#  Visual Studio Code specific template is maintained in a separate VisualStudioCode.gitignore 
+#  that can be found at https://github.com/github/gitignore/blob/main/Global/VisualStudioCode.gitignore
+#  and can be added to the global gitignore or merged into this file. However, if you prefer, 
+#  you could uncomment the following to ignore the entire vscode folder
+# .vscode/
+
+# Ruff stuff:
+.ruff_cache/
+
+# PyPI configuration file
+.pypirc
+
+# Cursor
+#  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
+#  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
+#  refer to https://docs.cursor.com/context/ignore-files
+.cursorignore
+.cursorindexingignore
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+tests/
+checkpoints/
+playground.ipynb
+.history/
+upload_checkpoints.sh
+checkpoints.7z
+README_old.md
+discord_bot/
+feishu_bot/
+tmp*
+torchinductor_root/
+scripts/*.pyc
+scripts/__pycache__/
+!scripts/check_gpu.py
+!scripts/prepare_vae_calibration_data.py
+checkpoints_legacy/
+lora_output/
+datasets/
+python_embeded/
+checkpoints_pack/
+issues/
+PortableGit/
+proxy_config.txt
+gradio_outputs/
+acestep/third_parts/vllm/
+test_lora_scale_fix.py
+lokr_output/
+.claude/skills/acestep/scripts/config.json
+.claude/skills/acestep/scripts/.first_gen_done
+.claude/skills/acestep-simplemv/scripts/public/
+config.json
+
+acestep_output/
+# macOS
+.DS_Store
+
+# VitePress / Node
+node_modules/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
+docs/en/awesome.md
+package-lock.json

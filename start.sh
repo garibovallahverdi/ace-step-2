@@ -1,31 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_MODE="${APP_MODE:-api}"
-CHECKPOINT_DIR="${CHECKPOINT_DIR:-./checkpoints}"
-DEVICE_ID="${DEVICE_ID:-0}"
-BF16="${BF16:-true}"
-TORCH_COMPILE="${TORCH_COMPILE:-false}"
-CPU_OFFLOAD="${CPU_OFFLOAD:-false}"
-OVERLAPPED_DECODE="${OVERLAPPED_DECODE:-false}"
+HOST="${HOST:-0.0.0.0}"
+PORT="${PORT:-8000}"
 
-if [ "$APP_MODE" = "gui" ]; then
-  exec acestep \
-    --server_name 0.0.0.0 \
-    --port "${GUI_PORT:-7865}" \
-    --checkpoint_path "$CHECKPOINT_DIR" \
-    --device_id "$DEVICE_ID" \
-    --bf16 "$BF16" \
-    --torch_compile "$TORCH_COMPILE" \
-    --cpu_offload "$CPU_OFFLOAD" \
-    --overlapped_decode "$OVERLAPPED_DECODE"
-fi
+# ACE-Step 1.5 model selection
+export ACESTEP_CONFIG_PATH="${ACESTEP_CONFIG_PATH:-acestep-v15-xl-turbo}"
+export ACESTEP_LM_MODEL_PATH="${ACESTEP_LM_MODEL_PATH:-acestep-5Hz-lm-1.7B}"
+export ACESTEP_DEVICE="${ACESTEP_DEVICE:-auto}"
+export ACESTEP_LM_BACKEND="${ACESTEP_LM_BACKEND:-vllm}"
+export ACESTEP_INIT_LLM="${ACESTEP_INIT_LLM:-auto}"
+export ACESTEP_DOWNLOAD_SOURCE="${ACESTEP_DOWNLOAD_SOURCE:-huggingface}"
 
-export CHECKPOINT_DIR
-export DEVICE_ID
-export BF16
-export TORCH_COMPILE
-export CPU_OFFLOAD
-export OVERLAPPED_DECODE
+# Optional: keep server startup fast by lazy-loading models (default behavior)
+export ACESTEP_NO_INIT="${ACESTEP_NO_INIT:-true}"
 
-exec python3 infer-api.py
+exec uv run --no-sync acestep-api --host "$HOST" --port "$PORT"

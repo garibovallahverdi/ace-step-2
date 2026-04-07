@@ -1,30 +1,45 @@
-FROM nvidia/cuda:12.6.0-runtime-ubuntu22.04 AS base
+FROM nvidia/cuda:12.8.0-runtime-ubuntu22.04 AS base
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8000 \
     HF_HUB_ENABLE_HF_TRANSFER=1 \
-    DEBIAN_FRONTEND=noninteractive
+    DEBIAN_FRONTEND=noninteractive \
+    ACESTEP_CONFIG_PATH=acestep-v15-xl-turbo \
+    ACESTEP_LM_MODEL_PATH=acestep-5Hz-lm-1.7B \
+    ACESTEP_DEVICE=auto \
+    ACESTEP_LM_BACKEND=vllm \
+    ACESTEP_INIT_LLM=auto \
+    ACESTEP_DOWNLOAD_SOURCE=huggingface \
+    ACESTEP_NO_INIT=true
 
 # Install Python and system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.10 \
-    python3-pip \
-    python3-venv \
-    python3-dev \
+    software-properties-common \
+    ca-certificates \
+    gnupg \
+    python3.11 \
+    python3.11-venv \
+    python3.11-dev \
     build-essential \
     git \
     curl \
     wget \
     ffmpeg \
+    libsndfile1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
-    && ln -s /usr/bin/python3 /usr/bin/python
+    && ln -sf /usr/bin/python3.11 /usr/bin/python \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python3
 
-# Create and activate virtual environment
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+RUN python3.11 -m ensurepip --upgrade && \
+    python3.11 -m pip install --no-cache-dir --upgrade pip
+
+# Install uv package manager
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --install-dir /usr/local/bin
+ENV PATH="/usr/local/bin:$PATH" \
+    UV_PYTHON=python3.11
 
 # Create a non-root user to run the application
 RUN useradd -m -u 1001 appuser
@@ -35,13 +50,8 @@ WORKDIR /app
 # Copy local source code into image
 COPY . /app
 
-# Install specific PyTorch version compatible with CUDA 12.6
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir hf_transfer peft && \
-    pip3 install --no-cache-dir -r requirements.txt -c constraints.txt \
-        --index-url https://download.pytorch.org/whl/cu126 \
-        --extra-index-url https://pypi.org/simple
-RUN pip3 install --no-cache-dir .
+# Install project dependencies (ACE-Step 1.5 uses uv/pyproject)
+RUN uv sync --no-dev
 
 # Ensure target directories for volumes exist and have correct initial ownership
 RUN mkdir -p /app/outputs /app/checkpoints /app/logs && \

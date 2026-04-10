@@ -39,7 +39,7 @@ RUN python3.11 -m ensurepip --upgrade && \
     python3.11 -m pip install --no-cache-dir --upgrade pip
 
 # Install uv package manager
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh -s -- --install-dir /usr/local/bin
+RUN python3.11 -m pip install --no-cache-dir uv
 ENV PATH="/usr/local/bin:$PATH" \
     UV_PYTHON=python3.11
 

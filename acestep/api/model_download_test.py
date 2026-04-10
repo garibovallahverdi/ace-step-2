@@ -72,6 +72,29 @@ class ModelDownloadTests(unittest.TestCase):
         hf_mock.assert_not_called()
         ms_mock.assert_not_called()
 
+    def test_ensure_model_downloaded_uses_xl_turbo_repo_mapping(self):
+        """Ensure helper should use the XL turbo repo mapping when downloading."""
+
+        with mock.patch.dict(os.environ, {"ACESTEP_DOWNLOAD_SOURCE": "huggingface"}, clear=False), mock.patch(
+            "acestep.api.model_download.os.path.exists",
+            return_value=False,
+        ), mock.patch(
+            "acestep.api.model_download.download_from_huggingface",
+            return_value="hf-path",
+        ) as hf_mock, mock.patch(
+            "acestep.api.model_download.download_from_modelscope",
+            return_value="ms-path",
+        ) as ms_mock:
+            out = model_download.ensure_model_downloaded("acestep-v15-xl-turbo", "checkpoints")
+
+        self.assertEqual("hf-path", out)
+        hf_mock.assert_called_once_with(
+            "ACE-Step/acestep-v15-xl-turbo",
+            "checkpoints",
+            "acestep-v15-xl-turbo",
+        )
+        ms_mock.assert_not_called()
+
     def test_ensure_model_downloaded_uses_huggingface_when_env_prefers_it(self):
         """Ensure helper should honor explicit HuggingFace preference."""
 

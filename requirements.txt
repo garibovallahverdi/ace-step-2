@@ -25,6 +25,7 @@ gradio==6.2.0
 matplotlib>=3.7.5
 scipy>=1.10.1
 soundfile>=0.13.1
+runpod
 loguru>=0.7.3
 einops>=0.8.1
 accelerate>=1.12.0

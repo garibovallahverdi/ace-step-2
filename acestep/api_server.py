@@ -96,6 +96,7 @@ from acestep.inference import (
     format_sample,
 )
 from acestep.ui.gradio.events.results_handlers import _build_generation_info
+from supabase_store import SupabaseStore
 
 def _get_project_root() -> str:
     current_file = os.path.abspath(__file__)
@@ -186,6 +187,7 @@ sys.stderr = _stderr_proxy
 
 def create_app() -> FastAPI:
     store = _JobStore()
+    supabase_store = SupabaseStore.from_env()
 
     # API Key authentication (from environment variable)
     api_key = os.getenv("ACESTEP_API_KEY", None)
@@ -208,6 +210,7 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI):
+        app.state.supabase_store = supabase_store
         runtime = initialize_lifespan_runtime(
             app=app,
             store=store,

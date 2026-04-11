@@ -140,7 +140,7 @@ async def generate_audio(input_data: ACEStepInput) -> ACEStepOutput:
 
         supabase_result: Optional[Dict[str, Any]] = None
         if input_data.upload_to_supabase:
-            supabase_result = supabase_store.persist_generated_audio(
+            supabase_result = supabase_store.persist_generated_audio_safe(
                 audio_path=final_output_path,
                 generation_id=generation_id,
                 metadata={

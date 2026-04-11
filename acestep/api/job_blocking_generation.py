@@ -185,7 +185,7 @@ def run_blocking_generate(
     )
 
     lm_model_name = os.getenv("ACESTEP_LM_MODEL_PATH", "acestep-5Hz-lm-0.6B")
-    return build_generation_success_response(
+    payload = build_generation_success_response(
         result=result,
         params=params,
         bpm=prepared_inputs.bpm,
@@ -200,3 +200,35 @@ def run_blocking_generate(
         lm_model_name=lm_model_name,
         dit_model_name=selected_model_name,
     )
+
+    supabase_store = getattr(app_state, "supabase_store", None)
+    if supabase_store is not None and getattr(supabase_store, "enabled", False):
+        uploads = []
+        raw_paths = payload.get("raw_audio_paths", []) or []
+        base_metadata = {
+            "job_id": job_id,
+            "prompt": payload.get("prompt"),
+            "lyrics": payload.get("lyrics"),
+            "metas": payload.get("metas", {}),
+        }
+        for idx, audio_path in enumerate(raw_paths):
+            if not audio_path:
+                uploads.append(
+                    {
+                        "enabled": True,
+                        "uploaded": False,
+                        "message": "Skipped Supabase upload: empty audio path.",
+                        "error": "empty_audio_path",
+                    }
+                )
+                continue
+            uploads.append(
+                supabase_store.persist_generated_audio_safe(
+                    audio_path=audio_path,
+                    generation_id=f"{job_id}_{idx}",
+                    metadata=base_metadata,
+                )
+            )
+        payload["supabase"] = {"enabled": True, "uploads": uploads}
+
+    return payload

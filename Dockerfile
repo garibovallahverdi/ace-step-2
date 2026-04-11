@@ -71,9 +71,5 @@ EXPOSE 8000 7865
 
 VOLUME [ "/app/checkpoints", "/app/outputs", "/app/logs" ]
 
-# Set healthcheck
-HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=5 \
-  CMD curl -f http://localhost:8000/health || exit 1
-
-# Command to run the application
-CMD ["./start.sh"]
+# Command to run the application (RunPod Serverless handler)
+CMD ["python", "-m", "serverless.handler"]

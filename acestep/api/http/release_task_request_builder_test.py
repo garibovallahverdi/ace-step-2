@@ -1,6 +1,8 @@
 """Unit tests for release-task request-model builder helpers."""
 
+import os
 import unittest
+from unittest import mock
 from types import SimpleNamespace
 
 from acestep.api.http.release_task_request_builder import build_generate_music_request
@@ -133,6 +135,22 @@ class ReleaseTaskRequestBuilderTests(unittest.TestCase):
 
         self.assertEqual("<|audio_code_7|>", request.audio_code_string)
         self.assertAlmostEqual(0.6, request.cover_noise_strength)
+
+    def test_build_request_uses_env_default_audio_format(self):
+        """Builder should honor ACESTEP_AUDIO_FORMAT_DEFAULT when audio_format is missing."""
+
+        parser = _FakeParser({"prompt": "hello"})
+        with mock.patch.dict(os.environ, {"ACESTEP_AUDIO_FORMAT_DEFAULT": "wav"}):
+            request = build_generate_music_request(
+                parser=parser,
+                request_model_cls=lambda **kwargs: SimpleNamespace(**kwargs),
+                default_dit_instruction="default-instruction",
+                lm_default_temperature=0.85,
+                lm_default_cfg_scale=2.5,
+                lm_default_top_p=0.9,
+            )
+
+        self.assertEqual("wav", request.audio_format)
 
 
 if __name__ == "__main__":

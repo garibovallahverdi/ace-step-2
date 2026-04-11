@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, Optional
 
 
@@ -81,7 +82,10 @@ def build_generate_music_request(
         cfg_interval_end=parser.float("cfg_interval_end", 1.0),
         infer_method=parser.str("infer_method", "ode"),
         shift=parser.float("shift", 3.0),
-        audio_format=parser.str("audio_format", "mp3"),
+        audio_format=parser.str(
+            "audio_format",
+            os.getenv("ACESTEP_AUDIO_FORMAT_DEFAULT", "flac"),
+        ),
         use_tiled_decode=parser.bool("use_tiled_decode", True),
         lm_model_path=parser.str("lm_model_path") or None,
         lm_backend=parser.str("lm_backend", "vllm"),

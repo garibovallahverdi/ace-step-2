@@ -1,5 +1,6 @@
 import mimetypes
 import os
+import time
 from typing import Any, Dict, Optional
 
 import boto3
@@ -102,4 +103,62 @@ class SupabaseStore:
             "signed_url": signed_url,
             "metadata": metadata or {},
             "message": "File uploaded to Supabase Storage (S3 API) successfully.",
+        }
+
+    def persist_generated_audio_safe(
+        self,
+        audio_path: str,
+        generation_id: str,
+        metadata: Optional[Dict[str, Any]] = None,
+        retries: int = 2,
+        retry_backoff_seconds: float = 1.0,
+    ) -> Dict[str, Any]:
+        """Upload generated audio with retries, never raising errors.
+
+        Args:
+            audio_path: Path to the generated audio file.
+            generation_id: Unique ID used for the object key.
+            metadata: Optional metadata to include in the response.
+            retries: Number of retries after the initial attempt.
+            retry_backoff_seconds: Base backoff time in seconds between retries.
+
+        Returns:
+            A response dict describing upload success/failure. Exceptions are
+            captured in the response rather than raised.
+        """
+        if not self.enabled:
+            return {
+                "enabled": False,
+                "uploaded": False,
+                "message": "Supabase S3 is not configured, skipped upload.",
+                "error": None,
+            }
+
+        attempts = max(0, int(retries)) + 1
+        last_error: Optional[str] = None
+        for attempt in range(attempts):
+            try:
+                return self.persist_generated_audio(
+                    audio_path=audio_path,
+                    generation_id=generation_id,
+                    metadata=metadata,
+                )
+            except Exception as exc:
+                last_error = str(exc)
+                logger.exception(
+                    "Supabase S3 upload attempt {}/{} failed: {}",
+                    attempt + 1,
+                    attempts,
+                    last_error,
+                )
+                if attempt < attempts - 1:
+                    sleep_seconds = retry_backoff_seconds * (attempt + 1)
+                    time.sleep(max(0.0, sleep_seconds))
+
+        return {
+            "enabled": True,
+            "uploaded": False,
+            "message": "Supabase S3 upload failed after retries.",
+            "error": last_error,
+            "metadata": metadata or {},
         }

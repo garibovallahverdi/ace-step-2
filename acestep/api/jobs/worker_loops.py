@@ -53,8 +53,14 @@ async def process_queue_item(
         if rec and rec.done_event:
             rec.done_event.set()
     finally:
-        await cleanup_job_temp_files(job_id)
-        app_state.job_queue.task_done()
+        try:
+            await cleanup_job_temp_files(job_id)
+        except Exception as exc:
+            print(f"[API Server] Temp file cleanup failed for job {job_id}: {exc}")
+        try:
+            app_state.job_queue.task_done()
+        except Exception as exc:
+            print(f"[API Server] job_queue.task_done failed for job {job_id}: {exc}")
 
 
 async def run_job_store_cleanup_loop(

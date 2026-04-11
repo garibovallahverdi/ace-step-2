@@ -72,4 +72,4 @@ EXPOSE 8000 7865
 VOLUME [ "/app/checkpoints", "/app/outputs", "/app/logs" ]
 
 # Command to run the application (RunPod Serverless handler)
-CMD ["python", "-m", "serverless.handler"]
+CMD ["uv", "run", "--no-sync", "python", "-m", "serverless.handler"]

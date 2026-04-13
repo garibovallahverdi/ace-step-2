@@ -12,6 +12,7 @@ from pydantic import BaseModel, Field
 
 from acestep.api.http.model_init_service import initialize_models_for_request
 from acestep.constants import TASK_TYPES_BASE, TASK_TYPES_TURBO
+from acestep.api.server_utils import get_checkpoints_dir
 
 
 class InitModelRequest(BaseModel):
@@ -58,7 +59,7 @@ def _collect_model_inventory(
     """
 
     project_root = get_project_root()
-    checkpoint_dir = os.path.join(project_root, "checkpoints")
+    checkpoint_dir = get_checkpoints_dir(lambda: project_root)
 
     loaded_dit_models: Dict[str, bool] = {}
     primary_model = get_model_name(getattr(app.state, "_config_path", ""))

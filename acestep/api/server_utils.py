@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 import re
-from typing import Optional
+from typing import Callable, Optional
 
 
 STATUS_MAP = {"queued": 0, "running": 0, "succeeded": 1, "failed": 2}
@@ -113,6 +113,30 @@ def get_model_name(config_path: str) -> str:
         return ""
     normalized = config_path.rstrip("/\\")
     return os.path.basename(normalized)
+
+
+def get_checkpoints_dir(get_project_root: Callable[[], str]) -> str:
+    """Resolve the checkpoints directory with environment overrides.
+
+    Resolution order:
+    1. ``ACESTEP_CHECKPOINTS_DIR`` (absolute shared model directory)
+    2. ``ACESTEP_PROJECT_ROOT`` + "/checkpoints"
+    3. ``get_project_root()`` + "/checkpoints" (repository default)
+
+    Args:
+        get_project_root: Callback that returns the project root path.
+
+    Returns:
+        Absolute path to the checkpoints directory.
+    """
+
+    env_dir = os.getenv("ACESTEP_CHECKPOINTS_DIR")
+    if env_dir:
+        return os.path.abspath(os.path.expanduser(env_dir))
+    env_root = os.getenv("ACESTEP_PROJECT_ROOT")
+    if env_root:
+        return os.path.join(os.path.abspath(os.path.expanduser(env_root)), "checkpoints")
+    return os.path.join(get_project_root(), "checkpoints")
 
 
 def map_status(status: str) -> int:

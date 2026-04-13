@@ -10,6 +10,7 @@ from acestep.gpu_config import (
     get_gpu_config,
     resolve_lm_backend,
 )
+from acestep.api.server_utils import get_checkpoints_dir
 
 
 def _resolve_slot(
@@ -90,7 +91,7 @@ def initialize_models_for_request(
 
     llm = app_state.llm_handler
     project_root = get_project_root()
-    checkpoint_dir = os.path.join(project_root, "checkpoints")
+    checkpoint_dir = get_checkpoints_dir(lambda: project_root)
     os.makedirs(checkpoint_dir, exist_ok=True)
 
     target_model = (model_name or get_model_name(current_config)).strip()

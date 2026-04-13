@@ -11,6 +11,7 @@ from acestep.gpu_config import (
     set_global_gpu_config,
 )
 from acestep.api.startup_llm_init import initialize_llm_at_startup
+from acestep.api.server_utils import get_checkpoints_dir
 
 
 def do_model_initialization(
@@ -61,7 +62,7 @@ def do_model_initialization(
     offload_dit_to_cpu = env_bool("ACESTEP_OFFLOAD_DIT_TO_CPU", False)
     compile_model = env_bool("ACESTEP_COMPILE_MODEL", False)
 
-    checkpoint_dir = os.path.join(project_root, "checkpoints")
+    checkpoint_dir = get_checkpoints_dir(lambda: project_root)
     os.makedirs(checkpoint_dir, exist_ok=True)
 
     dit_model_name = get_model_name(config_path)

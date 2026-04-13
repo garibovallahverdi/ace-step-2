@@ -10,6 +10,7 @@ import tempfile
 from contextlib import contextmanager
 from typing import Any, Callable, Dict, Optional
 
+from acestep.api.server_utils import get_checkpoints_dir
 
 def stop_tensorboard(app: Any) -> None:
     """Stop TensorBoard process if running."""
@@ -109,8 +110,7 @@ def temporary_llm_model(
             yield
             return
 
-        project_root = get_project_root()
-        checkpoint_dir = os.path.join(project_root, "checkpoints")
+        checkpoint_dir = get_checkpoints_dir(get_project_root)
         os.makedirs(checkpoint_dir, exist_ok=True)
 
         lm_model_name = get_model_name(desired)

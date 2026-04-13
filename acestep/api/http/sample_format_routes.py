@@ -8,6 +8,7 @@ from threading import Lock
 from typing import Any, Callable, Dict, List, Optional
 
 from fastapi import FastAPI, Header, HTTPException, Request
+from acestep.api.server_utils import get_checkpoints_dir
 
 
 def register_sample_format_routes(
@@ -73,8 +74,7 @@ def register_sample_format_routes(
                         detail="LLM not initialized. Set ACESTEP_INIT_LLM=true in .env to enable.",
                     )
 
-                project_root = get_project_root()
-                checkpoint_dir = os.path.join(project_root, "checkpoints")
+                checkpoint_dir = get_checkpoints_dir(get_project_root)
                 lm_model_path = os.getenv("ACESTEP_LM_MODEL_PATH", "acestep-5Hz-lm-0.6B").strip()
                 backend = os.getenv("ACESTEP_LM_BACKEND", "vllm").strip().lower()
                 if backend not in {"vllm", "pt", "mlx"}:
@@ -195,8 +195,7 @@ def register_sample_format_routes(
                         detail="LLM not initialized. Set ACESTEP_INIT_LLM=true in .env to enable.",
                     )
                 # Lazy-init LLM
-                project_root = get_project_root()
-                checkpoint_dir = os.path.join(project_root, "checkpoints")
+                checkpoint_dir = get_checkpoints_dir(get_project_root)
                 lm_model_path = os.getenv("ACESTEP_LM_MODEL_PATH", "acestep-5Hz-lm-0.6B").strip()
                 backend = os.getenv("ACESTEP_LM_BACKEND", "vllm").strip().lower()
                 if backend not in {"vllm", "pt", "mlx"}:

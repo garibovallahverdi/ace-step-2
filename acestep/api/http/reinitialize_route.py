@@ -7,6 +7,7 @@ from typing import Any, Callable, Dict
 
 import torch
 from fastapi import Depends, FastAPI, HTTPException
+from acestep.api.server_utils import get_checkpoints_dir
 
 
 def register_reinitialize_route(
@@ -57,8 +58,7 @@ def register_reinitialize_route(
             if llm and not llm.llm_initialized:
                 llm_params = getattr(llm, "last_init_params", None)
                 if llm_params is None:
-                    project_root = get_project_root()
-                    checkpoint_dir = os.path.join(project_root, "checkpoints")
+                    checkpoint_dir = get_checkpoints_dir(get_project_root)
                     lm_model_path = os.getenv("ACESTEP_LM_MODEL_PATH", "acestep-5Hz-lm-0.6B").strip()
                     backend = os.getenv("ACESTEP_LM_BACKEND", "vllm").strip().lower()
                     lm_device = os.getenv("ACESTEP_LM_DEVICE", os.getenv("ACESTEP_DEVICE", "auto"))

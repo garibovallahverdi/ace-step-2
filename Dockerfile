@@ -66,10 +66,12 @@ COPY . /app
 RUN uv sync --no-dev
 
 # Preload model weights into the image (optional, large)
-RUN if [ "$PRELOAD_MODELS" = "1" ]; then \
-    HF_TOKEN="$HF_TOKEN" uv run --no-sync python - <<'PY'
+RUN HF_TOKEN="$HF_TOKEN" PRELOAD_MODELS="$PRELOAD_MODELS" uv run --no-sync python - <<'PY'
 import os
 from acestep import model_downloader as md
+
+if os.getenv("PRELOAD_MODELS", "1") != "1":
+    raise SystemExit(0)
 
 def _require(success: bool, message: str) -> None:
     if not success:
@@ -113,7 +115,6 @@ if lm_model and lm_model != md.DEFAULT_LM_MODEL:
     )
     _require(ok, msg)
 PY
-    fi
 
 # Ensure target directories for volumes exist and have correct initial ownership
 RUN mkdir -p /app/outputs /app/checkpoints /app/logs && \

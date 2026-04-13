@@ -67,21 +67,21 @@ RUN uv sync --no-dev
 
 # Preload model weights into the image (optional, large)
 RUN if [ "$PRELOAD_MODELS" = "1" ]; then \
-    HF_TOKEN="$HF_TOKEN" uv run --no-sync python - <<'PY' \
+    HF_TOKEN="$HF_TOKEN" uv run --no-sync python - <<'PY'
 import os
 from acestep import model_downloader as md
-\
+
 def _require(success: bool, message: str) -> None:
     if not success:
         raise SystemExit(message)
-\
+
 token = os.getenv("HF_TOKEN") or None
 prefer = os.getenv("ACESTEP_DOWNLOAD_SOURCE") or None
 config = os.getenv("ACESTEP_CONFIG_PATH", "acestep-v15-turbo").strip()
 lm_model = os.getenv("ACESTEP_LM_MODEL_PATH", md.DEFAULT_LM_MODEL).strip()
-\
+
 checkpoints_dir = md.get_checkpoints_dir()
-\
+
 needs_main = config in md.SUBMODEL_REGISTRY or config == "acestep-v15-turbo"
 if needs_main:
     ok, msg = md.download_main_model(
@@ -90,7 +90,7 @@ if needs_main:
         prefer_source=prefer,
     )
     _require(ok, msg)
-\
+
 if config and config != "acestep-v15-turbo":
     if config not in md.SUBMODEL_REGISTRY:
         raise SystemExit(f"Unknown DiT model '{config}'.")
@@ -101,7 +101,7 @@ if config and config != "acestep-v15-turbo":
         prefer_source=prefer,
     )
     _require(ok, msg)
-\
+
 if lm_model and lm_model != md.DEFAULT_LM_MODEL:
     if lm_model not in md.SUBMODEL_REGISTRY:
         raise SystemExit(f"Unknown LM model '{lm_model}'.")
@@ -112,8 +112,8 @@ if lm_model and lm_model != md.DEFAULT_LM_MODEL:
         prefer_source=prefer,
     )
     _require(ok, msg)
-PY \
-; fi
+PY
+    fi
 
 # Ensure target directories for volumes exist and have correct initial ownership
 RUN mkdir -p /app/outputs /app/checkpoints /app/logs && \

@@ -6,6 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000 \
     HF_HUB_ENABLE_HF_TRANSFER=1 \
     DEBIAN_FRONTEND=noninteractive \
+    ACESTEP_API_HOST=0.0.0.0 \
+    ACESTEP_API_PORT=8000 \
     ACESTEP_CONFIG_PATH=acestep-v15-xl-turbo \
     ACESTEP_LM_MODEL_PATH=acestep-5Hz-lm-1.7B \
     ACESTEP_DEVICE=auto \
@@ -71,5 +73,5 @@ EXPOSE 8000 7865
 
 VOLUME [ "/app/checkpoints", "/app/outputs", "/app/logs" ]
 
-# Command to run the application (RunPod Serverless handler)
-CMD ["uv", "run", "--no-sync", "python", "-m", "serverless.handler"]
+# Command to run the application (Verda serverless container entrypoint)
+CMD ["uv", "run", "--no-sync", "python", "-m", "acestep.api_server"]

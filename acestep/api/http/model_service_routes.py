@@ -148,7 +148,7 @@ def register_model_service_routes(
         """Health check endpoint for service status."""
 
         inventory = _collect_model_inventory(app, get_project_root, get_model_name)
-        return wrap_response(
+        response = wrap_response(
             {
                 "status": "ok",
                 "service": "ACE-Step API",
@@ -159,6 +159,8 @@ def register_model_service_routes(
                 "loaded_lm_model": inventory["loaded_lm_model"],
             }
         )
+        response["status"] = "ok"
+        return response
 
     @app.get("/v1/stats")
     async def get_stats(_: None = Depends(verify_api_key)):
